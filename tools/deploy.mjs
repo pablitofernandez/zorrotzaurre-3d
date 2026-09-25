@@ -3,11 +3,14 @@ import { execSync } from 'node:child_process';
 import { existsSync, writeFileSync } from 'node:fs';
 
 const run = (cmd, cwd) => execSync(cmd, { cwd, stdio: 'inherit' });
-const remote = execSync('git remote get-url origin').toString().trim();
+const git = (args) => execSync(`git ${args}`).toString().trim();
+const remote = git('remote get-url origin');
+// Commit with the identity configured for this repository, not a different global one
+const identity = `-c user.name="${git('config user.name')}" -c user.email="${git('config user.email')}"`;
 
 if (!existsSync('dist/index.html')) throw new Error('dist/index.html not found: run the build first');
 writeFileSync('dist/.nojekyll', '');
 run('git init -q -b gh-pages', 'dist');
 run('git add -A', 'dist');
-run('git commit -q -m "Deploy"', 'dist');
+run(`git ${identity} commit -q -m "Deploy"`, 'dist');
 run(`git push -f ${remote} gh-pages`, 'dist');
