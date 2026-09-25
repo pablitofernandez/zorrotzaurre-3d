@@ -1,0 +1,16 @@
+.github/
+node_modules/
+dist/
+.playwright-mcp/
+__pycache__/
+*.pyc
+
+# Large or regenerable pipeline inputs/caches (see README)
+tools/dem/
+tools/osm_*.json
+tools/*.npy
+tools/prev_*.png
+tools/dem15.png
+
+# Private source documents and the parcel plan are never committed
+*.pdf

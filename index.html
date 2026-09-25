@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0e1116" />
+    <meta name="color-scheme" content="light" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Zorrotzaurre 3D" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="description" content="Modelo 3D del edificio RD-15.1 (Zorrotzaurre, Bilbao) y recorrido virtual por una vivienda tipo C en la planta que elijas." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%A0%3C/text%3E%3C/svg%3E" />
+    <title>Zorrotzaurre 3D · Punta Sur · RD-15.1</title>
+  </head>
+  <body data-mode="exterior">
+    <a class="skip" href="#floor-select">Saltar a la elección de planta</a>
+
+    <main id="app" aria-labelledby="scene-title">
+      <h1 id="scene-title" class="sr-only">Visor 3D del bloque RD-15.1 y de una vivienda tipo C, Zorrotzaurre (Bilbao)</h1>
+    </main>
+
+    <header class="panel top">
+      <div class="brand">
+        <b>Zorrotzaurre · Punta Sur</b>
+        <span>RD-15.1 · Vivienda C · <span id="brand-floor">planta</span></span>
+      </div>
+      <nav class="modes" aria-label="Modo de vista">
+        <button type="button" data-mode="exterior" aria-pressed="true" aria-keyshortcuts="1"><span aria-hidden="true">🏙️</span> <span class="lbl">Edificio</span></button>
+        <button type="button" data-mode="dollhouse" aria-pressed="false" aria-keyshortcuts="2"><span aria-hidden="true">🏠</span> <span class="lbl">Planta</span></button>
+        <button type="button" data-mode="walk" aria-pressed="false" aria-keyshortcuts="3"><span aria-hidden="true">🚶</span> <span class="lbl">Recorrer</span></button>
+      </nav>
+      <div class="tools">
+        <label class="floor" for="floor-select" title="Planta de la vivienda"
+          ><span aria-hidden="true">🏢</span><span class="sr-only">Planta de la vivienda</span>
+          <select id="floor-select" aria-keyshortcuts="PageUp PageDown"></select></label
+        >
+        <label class="time" for="hour-range"
+          ><span aria-hidden="true">☀️</span><span class="sr-only">Hora del día</span>
+          <input id="hour-range" type="range" min="6" max="23" step="0.25" />
+          <output id="hour" for="hour-range" aria-hidden="true">17:30</output></label
+        >
+        <button type="button" id="labels-toggle" class="icon" aria-pressed="true" title="Nombres de lugares"><span aria-hidden="true">🏷️</span><span class="sr-only">Mostrar nombres de lugares</span></button>
+        <button type="button" id="help-btn" class="icon" aria-expanded="false" aria-controls="help" aria-keyshortcuts="H" title="Controles"><span aria-hidden="true">❔</span><span class="sr-only">Ayuda de controles</span></button>
+      </div>
+    </header>
+
+    <aside class="panel side" aria-label="Navegación por la vivienda">
+      <div class="side-col">
+        <div id="map"></div>
+        <label class="fov" for="fov-range" title="Campo de visión"
+          ><span><span aria-hidden="true">👁️</span> Campo de visión <output id="fov-val" for="fov-range" aria-hidden="true"></output></span>
+          <input id="fov-range" type="range" min="40" max="110" step="1" aria-keyshortcuts="- +"
+        /></label>
+      </div>
+      <nav id="rooms" aria-label="Ir a una estancia"></nav>
+    </aside>
+
+    <div id="compass" aria-hidden="true"><div class="rose"><span class="n">N</span></div><b id="heading"></b></div>
+
+    <div id="room" aria-hidden="true"></div>
+    <div id="crosshair" aria-hidden="true"></div>
+
+    <div id="hint-ext" class="hint" aria-hidden="true"><span class="desk">Pulsa sobre la vivienda resaltada en rojo o en <b>🚶 Recorrer</b> para entrar</span><span class="touch">Toca la vivienda en rojo o <b>🚶 Recorrer</b> para entrar</span></div>
+    <div id="hint-doll" class="hint" aria-hidden="true"><span class="desk">Pulsa</span><span class="touch">Toca</span> en el suelo de una estancia para entrar ahí</div>
+    <div id="hint-walk" class="hint" aria-hidden="true"><span class="desk">Haz clic para controlar la vista · <b>Esc</b> para liberar el ratón</span><span class="touch">Izquierda: moverse · Derecha: mirar</span></div>
+
+    <button type="button" id="gyro-btn" class="panel round" aria-pressed="false" hidden><span aria-hidden="true">📱</span><span class="sr-only">Mirar moviendo el móvil</span></button>
+
+    <div id="help" class="panel" role="dialog" aria-modal="false" aria-labelledby="help-title" hidden>
+      <button type="button" class="close" id="help-close" aria-label="Cerrar ayuda" title="Cerrar">✕</button>
+      <h2 id="help-title">Controles</h2>
+      <ul class="desk">
+        <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / flechas: moverse y girar</li>
+        <li><kbd>Q</kbd> <kbd>E</kbd>: girar · <kbd>R</kbd> <kbd>F</kbd>: mirar arriba / abajo</li>
+        <li>Ratón: mirar (arrastra, o clic para capturar y <kbd>Esc</kbd> para soltar)</li>
+        <li><kbd>Shift</kbd>: andar más rápido</li>
+        <li>Minimapa o lista: saltar a una estancia</li>
+        <li><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>: edificio / planta / recorrer · <kbd>H</kbd>: esta ayuda</li>
+        <li><kbd>RePág</kbd> <kbd>AvPág</kbd>: subir / bajar de planta</li>
+        <li><kbd>-</kbd> <kbd>+</kbd>: campo de visión (dentro de la vivienda)</li>
+        <li><kbd>V</kbd>: describir lo que tienes delante (lector de pantalla)</li>
+      </ul>
+      <ul class="touch">
+        <li>Mitad izquierda: arrastra para caminar</li>
+        <li>Mitad derecha: arrastra para mirar</li>
+        <li>📱: mirar moviendo el móvil</li>
+        <li>Minimapa o botones: saltar a una estancia</li>
+        <li>🏢: elegir la planta · 👁️: campo de visión</li>
+        <li>Fuera: un dedo gira, dos dedos acercan o desplazan</li>
+      </ul>
+      <p class="note">Volumen del edificio, distribución, mobiliario, entorno y alturas de edificios vecinos aproximados. Datos del entorno © colaboradores de OpenStreetMap; relieve: Mapzen Terrarium.</p>
+    </div>
+
+    <div id="sr-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <div id="loading" role="status"><div class="spinner" aria-hidden="true"></div>Construyendo el edificio…</div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
